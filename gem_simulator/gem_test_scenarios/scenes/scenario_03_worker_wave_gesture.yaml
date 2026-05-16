@@ -1,0 +1,51 @@
+# =============================================================================
+# SCENARIO 03 – Construction Worker Wave Gesture (SLOW DOWN)
+# =============================================================================
+# World      : track1.world
+# Vehicle    : x=0, y=0, yaw=0 (facing +x)
+# Goal       : Vehicle must SLOW DOWN when construction worker is waving.
+# Note       : Gazebo Classic cannot animate custom gestures. The visual actor
+#              represents a worker standing near the road. The mock_perception_
+#              publisher.py injects the VLM label "SLOW" after trigger_delay to
+#              simulate what VLM would output upon seeing a waving worker.
+# Pipeline   : mock_perception → /vlm/scene_label="SLOW" → safety layer SLOW.
+# Evaluation : Vehicle speed <= SLOW_SPEED (1.0 m/s) when near worker = PASS.
+# =============================================================================
+
+objects:
+  - name: cone_work_zone_1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [12.0, 2.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_work_zone_2
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [15.0, 2.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_work_zone_3
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [18.0, 2.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_work_zone_4
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [18.0, -2.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+agents:
+  # Construction worker standing near the road – waving gesture injected by
+  # mock_perception_publisher.py since Gazebo Classic has no custom animations.
+  - name: construction_worker_wave
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"}
+    trajectory:
+      #  time   x      y      z    r    p   yaw
+      - [ 0.0,  15.0,  3.0,  0.0, 0.0, 0.0, -1.57]   # facing vehicle
+      - [ 4.0,  15.0,  3.5,  0.0, 0.0, 0.0, -1.57]   # slight sway to simulate wave
+      - [ 8.0,  15.0,  2.5,  0.0, 0.0, 0.0, -1.57]   # sway other side
+      - [12.0,  15.0,  3.0,  0.0, 0.0, 0.0, -1.57]   # return centre
+      - [16.0,  15.0,  3.5,  0.0, 0.0, 0.0, -1.57]   # loop

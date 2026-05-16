@@ -1,0 +1,53 @@
+# =============================================================================
+# SCENARIO 04 – Construction Worker STOP Gesture
+# =============================================================================
+# World      : track1.world
+# Vehicle    : x=0, y=0, yaw=0 (facing +x)
+# Goal       : Vehicle must STOP when construction worker raises STOP gesture.
+# Note       : Same Gazebo limitation as scenario 03. Worker moves toward road
+#              centre to block path. mock_perception_publisher injects
+#              /vlm/scene_label="STOP" after trigger_delay seconds.
+# Pipeline   : mock_perception → /vlm/scene_label="STOP" → safety layer STOP.
+# Evaluation : Vehicle brakes to 0 m/s in front of worker = PASS.
+#              Collision = FAILURE.
+# =============================================================================
+
+objects:
+  - name: barrier_cone_l1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [14.0, 1.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: barrier_cone_r1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [14.0, -1.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: barrier_cone_l2
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [16.0, 1.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: barrier_cone_r2
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [16.0, -1.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+agents:
+  # Worker steps into road centre to block – STOP gesture injected by
+  # mock_perception_publisher.py after trigger_delay seconds.
+  - name: construction_worker_stop
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"}
+    trajectory:
+      #  time   x      y      z    r    p   yaw
+      - [ 0.0,  18.0,  4.0,  0.0, 0.0, 0.0, -1.57]   # standing at roadside
+      - [ 5.0,  18.0,  2.0,  0.0, 0.0, 0.0, -1.57]   # step toward road
+      - [ 8.0,  18.0,  0.5,  0.0, 0.0, 0.0, -1.57]   # centre of road (blocking)
+      - [20.0,  18.0,  0.5,  0.0, 0.0, 0.0, -1.57]   # hold position (gesture active)
+      - [25.0,  18.0,  2.0,  0.0, 0.0, 0.0,  1.57]   # step back
+      - [28.0,  18.0,  4.0,  0.0, 0.0, 0.0,  1.57]   # return roadside
+      - [29.0,  18.0,  4.0,  0.0, 0.0, 0.0, -1.57]   # loop

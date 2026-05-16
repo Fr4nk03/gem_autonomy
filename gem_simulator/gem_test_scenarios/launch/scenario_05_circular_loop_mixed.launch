@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+  SCENARIO 05: Circular Loop – Full Integration Test
+  Uses highbay_track.world (oval loop). Multiple obstacles placed around the track:
+    Zone A – Work cones + pedestrian crossing
+    Zone B – Stop sign + construction worker wave
+    Zone C – Traffic light reference
+    Zone D – Oncoming vehicle
+  mock_perception_publisher cycles through all event types on the loop.
+
+  Usage:
+    roslaunch gem_test_scenarios scenario_05_circular_loop_mixed.launch
+    roslaunch gem_test_scenarios scenario_05_circular_loop_mixed.launch gui:=false  # headless
+-->
+<launch>
+  <arg name="x"   default="0.0"/>
+  <arg name="y"   default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+  <arg name="gui" default="true"/>
+  <arg name="vehicle_name" default="e4"/>
+
+  <include file="$(find gem_launch)/launch/gem_init.launch">
+    <arg name="world_name"   value="highbay_track.world"/>
+    <arg name="custom_scene" value="true"/>
+    <arg name="scene_yaml"   value="$(find gem_test_scenarios)/scenes/scenario_05_circular_loop_mixed.yaml"/>
+    <arg name="x"            value="$(arg x)"/>
+    <arg name="y"            value="$(arg y)"/>
+    <arg name="yaw"          value="$(arg yaw)"/>
+    <arg name="vehicle_name" value="$(arg vehicle_name)"/>
+    <arg name="gui"          value="$(arg gui)"/>
+  </include>
+
+  <!-- Mock perception: full loop cycle through all event types -->
+  <node pkg="gem_test_scenarios"
+        type="mock_perception_publisher.py"
+        name="mock_perception"
+        output="screen">
+    <param name="scenario_type" value="circular_loop"/>
+    <param name="trigger_delay" value="5.0"/>
+    <param name="loop"          value="true"/>
+    <param name="publish_rate"  value="5.0"/>
+  </node>
+</launch>

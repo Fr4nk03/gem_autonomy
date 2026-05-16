@@ -1,0 +1,41 @@
+# =============================================================================
+# SCENARIO 01 – Stop Sign in Path
+# =============================================================================
+# World      : track1.world
+# Vehicle    : x=0, y=0, yaw=0 (facing +x)
+# Goal       : Vehicle must STOP when stop sign is ~20 m ahead.
+# Pipeline   : YOLO detects stop_sign → VLM confirms "STOP" → safety layer stops vehicle.
+# Evaluation : Collision with sign post counts as FAILURE.
+#              Vehicle braking to 0 m/s before sign = PASS.
+# =============================================================================
+
+objects:
+  - name: stop_sign_ahead
+    source: {type: sdf, uri: "model://stop_sign"}
+    xyz: [20.0, 0.0, 0.0]
+    rpy: [0.0, 0.0, 1.57]   # face vehicle
+    static: true
+
+  - name: cone_left_a
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [17.0, 1.8, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_right_a
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [17.0, -1.8, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_left_b
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [21.0, 1.8, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_right_b
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [21.0, -1.8, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true

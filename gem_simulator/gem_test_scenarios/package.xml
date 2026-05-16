@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gem_test_scenarios</name>
+  <version>0.1.0</version>
+  <description>Test scenario definitions for CS588 Team 6 VLM-based autonomous driving project.</description>
+  <maintainer email="yuvaraj5@illinois.edu">CS588 Team 6</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>gem_gazebo</exec_depend>
+  <exec_depend>gem_launch</exec_depend>
+</package>

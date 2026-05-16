@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  SCENARIO 02: Pedestrian Crossing Road
+  Launches track1.world with two pedestrians: one crossing, one on pavement.
+  mock_perception_publisher simulates phases: PROCEED → YIELD → STOP → PROCEED.
+
+  Usage:
+    roslaunch gem_test_scenarios scenario_02_pedestrian_crossing.launch
+-->
+<launch>
+  <arg name="x"   default="0.0"/>
+  <arg name="y"   default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+  <arg name="gui" default="true"/>
+  <arg name="vehicle_name" default="e4"/>
+
+  <include file="$(find gem_launch)/launch/gem_init.launch">
+    <arg name="world_name"   value="track1.world"/>
+    <arg name="custom_scene" value="true"/>
+    <arg name="scene_yaml"   value="$(find gem_test_scenarios)/scenes/scenario_02_pedestrian_crossing.yaml"/>
+    <arg name="x"            value="$(arg x)"/>
+    <arg name="y"            value="$(arg y)"/>
+    <arg name="yaw"          value="$(arg yaw)"/>
+    <arg name="vehicle_name" value="$(arg vehicle_name)"/>
+    <arg name="gui"          value="$(arg gui)"/>
+  </include>
+
+  <!-- Mock perception: phases through PROCEED → YIELD → STOP → clear → PROCEED -->
+  <node pkg="gem_test_scenarios"
+        type="mock_perception_publisher.py"
+        name="mock_perception"
+        output="screen">
+    <param name="scenario_type" value="pedestrian_crossing"/>
+    <param name="trigger_delay" value="3.0"/>
+    <param name="loop"          value="true"/>
+    <param name="publish_rate"  value="5.0"/>
+  </node>
+</launch>

@@ -1,0 +1,110 @@
+# =============================================================================
+# SCENARIO 05 – Circular Loop with Mixed Obstacles (Full Integration Test)
+# =============================================================================
+# World      : highbay_track.world
+# Vehicle    : x=0, y=0, yaw=0
+# Goal       : Vehicle completes a full loop while correctly responding to:
+#                • Stop sign → STOP and wait, then PROCEED
+#                • Pedestrian crossing → STOP, PROCEED after clear
+#                • Worker wave → SLOW through work zone
+#                • Worker stop gesture → STOP, PROCEED when released
+#                • Construction cones → navigate/slow
+# Pipeline   : Full integration: YOLO + VLM + safety layer + trajectory planner.
+#              Alternatively, mock_perception_publisher (scenario_type=circular_loop)
+#              can inject timed events for each zone.
+# Evaluation : Zero collisions per full loop = PASS.
+#              Correct action per zone (logged via /safety/action_override) = PASS.
+# =============================================================================
+# Coordinate reference (highbay_track.world):
+#   Vehicle approaches track from (0,0) toward negative-x/y region.
+#   Road runs roughly from x=0 to x=-40, y=-14 to y=-28.
+# =============================================================================
+
+objects:
+  # ── Zone A: Work Zone Entry (cones narrowing lane) ────────────────────────
+  - name: cone_zone_a_l1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-11.0, -15.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_zone_a_r1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-11.0, -22.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_zone_a_l2
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-14.0, -16.0, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_zone_a_r2
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-14.0, -22.0, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  # ── Zone B: Stop Sign ─────────────────────────────────────────────────────
+  - name: stop_sign_loop
+    source: {type: sdf, uri: "model://stop_sign"}
+    xyz: [-26.8, -19.2, 0.0]
+    rpy: [0.0, 0.0, 1.57]
+    static: true
+
+  # ── Zone C: Traffic Light (visual reference) ──────────────────────────────
+  - name: traffic_light_loop
+    source: {type: mesh, uri: "model://traffic_light/meshes/traffic_light.dae", scale: [0.03, 0.03, 0.03]}
+    xyz: [-34.96, -19.43, 0.0]
+    rpy: [0.0, 0.0, 1.57]
+    static: true
+
+  # ── Zone D: Back-stretch construction barrier ─────────────────────────────
+  - name: cone_back_l1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-32.0, -16.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+  - name: cone_back_r1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+    xyz: [-32.0, -22.5, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+    static: true
+
+agents:
+  # ── Zone A: Pedestrian crossing at work zone entry ────────────────────────
+  - name: pedestrian_loop_1
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"}
+    trajectory:
+      #  time    x       y       z    r    p   yaw
+      - [ 0.0,  -12.5, -14.5,  0.0, 0.0, 0.0,  -1.57]   # roadside top
+      - [ 5.0,  -12.5, -19.0,  0.0, 0.0, 0.0,  -1.57]   # crossing centre
+      - [10.0,  -12.5, -24.0,  0.0, 0.0, 0.0,  -1.57]   # roadside bottom
+      - [10.5,  -12.5, -24.0,  0.0, 0.0, 0.0,   1.57]   # turn
+      - [15.5,  -12.5, -19.0,  0.0, 0.0, 0.0,   1.57]   # crossing centre
+      - [20.5,  -12.5, -14.5,  0.0, 0.0, 0.0,   1.57]   # back start
+      - [21.0,  -12.5, -14.5,  0.0, 0.0, 0.0,  -1.57]   # loop
+
+  # ── Zone B: Construction worker – SLOW gesture near stop sign ─────────────
+  - name: construction_worker_loop
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"}
+    trajectory:
+      #  time    x       y       z    r    p   yaw
+      - [ 0.0,  -22.0, -17.5,  0.0, 0.0, 0.0, -1.57]   # roadside – facing road
+      - [ 5.0,  -22.0, -18.5,  0.0, 0.0, 0.0, -1.57]   # shift to simulate wave
+      - [10.0,  -22.0, -17.0,  0.0, 0.0, 0.0, -1.57]   # shift back
+      - [15.0,  -22.0, -18.5,  0.0, 0.0, 0.0, -1.57]   # wave again
+      - [20.0,  -22.0, -17.5,  0.0, 0.0, 0.0, -1.57]   # loop
+
+  # ── Zone D: Oncoming/crossing vehicle (rigid) ─────────────────────────────
+  - name: oncoming_car
+    motion: rigid
+    source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/JShep1/models/hatchback_2"}
+    trajectory:
+      #  time    x       y       z     r    p   yaw
+      - [ 0.0,  -17.0, -28.0,   0.1, 0.0, 0.0,  0.0]
+      - [ 4.0,    2.0, -28.0,   0.1, 0.0, 0.0,  0.0]
+      - [ 4.5,    2.0, -28.0,   0.1, 0.0, 0.0,  3.14]
+      - [ 8.5,  -17.0, -28.0,   0.1, 0.0, 0.0,  3.14]
