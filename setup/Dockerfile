@@ -10,6 +10,7 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y \
     git \
     sudo \
+    tmux \
     python3-pip \
     build-essential \
     cmake \
@@ -30,44 +31,41 @@ RUN apt-get install -y \
     ros-noetic-velodyne-simulator \
     ros-noetic-septentrio-gnss-driver \
     ros-noetic-novatel-gps-msgs \
-    ros-noetic-nodelet \
-    ros-noetic-nodelet-topic-tools \
-    ros-noetic-jsk-topic-tools \
-    ros-noetic-jsk-recognition-msgs \
+    ros-noetic-vision-msgs \
+    ros-noetic-cv-bridge \
     && rm -rf /var/lib/apt/lists/*
 
-ARG USER=Fr4nk
-ARG USER_UID=1000
-ARG USER_GID=1000
+RUN pip3 install ultralytics
 
-# RUN groupadd -g ${USER_GID} ${USER} || groupmod -n ${USER} $(getent group ${USER_GID} | cut -d: -f1)
-# RUN useradd -l -m -u ${USER_UID} -g ${USER_GID} ${USER} || usermod -l ${USER} -m -u ${USER_UID} -g ${USER_GID} $(getent passwd ${USER_UID} | cut -d: -f1)
-# Hardcode 'Fr4nk' and the ID 1000 directly to bypass Windows environment issues
-RUN groupadd -g 1000 Fr4nk || groupmod -n Fr4nk $(getent group 1000 | cut -d: -f1)
-RUN useradd -l -m -u 1000 -g 1000 Fr4nk || usermod -l Fr4nk -m -u 1000 -g 1000 $(getent passwd 1000 | cut -d: -f1)
-RUN echo "Fr4nk ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+ARG USER
+ARG USER_UID
+ARG USER_GID
 
-RUN chown -R Fr4nk:Fr4nk /home/Fr4nk
+RUN groupadd -g ${USER_GID} ${USER} || groupmod -n ${USER} $(getent group ${USER_GID} | cut -d: -f1)
+RUN useradd -l -m -u ${USER_UID} -g ${USER_GID} ${USER} || usermod -l ${USER} -m -u ${USER_UID} -g ${USER_GID} $(getent passwd ${USER_UID} | cut -d: -f1)
+RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+RUN chown -R ${USER}:${USER} /home/${USER}
 
 RUN mkdir -p /usr/local/lib/python3.8/dist-packages \
-    && chown -R Fr4nk:Fr4nk /usr/local/lib/python3.8/dist-packages/
+    && chown -R ${USER}:${USER} /usr/local/lib/python3.8/dist-packages/
 
-RUN mkdir -p /catkin_ws/src && chown -R Fr4nk:Fr4nk /catkin_ws
+RUN mkdir -p /catkin_ws/src && chown -R ${USER}:${USER} /catkin_ws
 
-USER root
-RUN chown -R Fr4nk:Fr4nk /opt/ros/noetic
+USER ${USER}
+RUN sudo chown -R ${USER}:${USER} /opt/ros/noetic
 
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /catkin_ws && catkin_make -DCMAKE_BUILD_TYPE=Release"
 
 USER root
-RUN chown -R Fr4nk:Fr4nk /home/Fr4nk
-USER Fr4nk
+RUN chown -R ${USER}:${USER} /home/${USER}
+USER ${USER}
 
 # Add ROS setup to user's bashrc
-RUN echo 'export PATH=$HOME/.local/bin:$PATH' >> /home/Fr4nk/.bashrc
-RUN echo "source /opt/ros/noetic/setup.bash" >> /home/Fr4nk/.bashrc
+RUN echo 'export PATH=$HOME/.local/bin:$PATH' >> /home/${USER}/.bashrc
+RUN echo "source /opt/ros/noetic/setup.bash" >> /home/${USER}/.bashrc
 
-WORKDIR /home/Fr4nk
+WORKDIR /home/${USER}
 
 # Set container entrypoint
 ENTRYPOINT ["/bin/bash"]

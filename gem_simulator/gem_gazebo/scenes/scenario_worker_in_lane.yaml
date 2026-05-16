@@ -16,5 +16,5 @@ agents:
       uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"
     trajectory:
       # Stand still on the centerline, facing the vehicle.
-      - [0.0,  0.0, -21.0, 0.0, 0.0, 0.0, 1.5708]
-      - [60.0, 0.0, -21.0, 0.0, 0.0, 0.0, 1.5708]
+      - [0.0,  -5.0, -21.0, 0.0, 0.0, 0.0, 1.5708]
+      - [60.0, -5.0, -21.0, 0.0, 0.0, 0.0, 1.5708]

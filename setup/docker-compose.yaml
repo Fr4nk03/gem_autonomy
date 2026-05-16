@@ -11,21 +11,15 @@ services:
         USER_GID: ${GID:-1000}  # Pass host GID
     stdin_open: true
     tty: true
-    # volumes:
-    #   - "/etc/group:/etc/group:ro"
-    #   - "/etc/passwd:/etc/passwd:ro"
-    #   - "/etc/shadow:/etc/shadow:ro"
-    #   - "/etc/sudoers.d:/etc/sudoers.d:ro"
-    #   - "${HOME}:/home/${USER}/host"
-    #   - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-    #   - "/dev/shm:/dev/shm"
-    # working_dir: ${CONTAINER_WD:-}
-
     volumes:
-      - "../../../..:/home/Fr4nk/host"
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      - "/etc/sudoers.d:/etc/sudoers.d:ro"
+      - "${HOME}:/home/${USER}/host"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-    working_dir: /home/Fr4nk/host
-    user: "1000:1000"
+      - "/dev/shm:/dev/shm"
+    working_dir: ${CONTAINER_WD:-}
     environment:
       - DISPLAY=${DISPLAY}
       - USER=${USER}
@@ -38,14 +32,14 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
     network_mode: host
     ipc: host
-    # user: "${UID:-1000}:${GID:-1000}"
+    user: "${UID:-1000}:${GID:-1000}"
     # Comment the following lines if you don't want to use Nvidia GPU
-    runtime: nvidia
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
+    #runtime: nvidia
+    #deploy:
+    # resources:
+       # reservations:
+          #devices:
+            #- driver: nvidia
+              #count: all # alternatively, use `count: all` for all GPUs
+              #capabilities: [gpu]
 

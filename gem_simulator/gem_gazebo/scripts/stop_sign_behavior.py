@@ -27,8 +27,8 @@ from gazebo_msgs.msg       import ModelStates
 
 
 # ── speed setpoints (m/s) — straight-line only ──────────────────────────
-SPEED_PROCEED = 1.5
-SPEED_SLOW    = 0.5
+SPEED_PROCEED = 0.5
+SPEED_SLOW    = 0.2
 SPEED_STOP    = 0.0
 
 # ── timing constants (s) ────────────────────────────────────────────────

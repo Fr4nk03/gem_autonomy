@@ -71,7 +71,7 @@ class YoloDetectorNode:
         # ── danger zone params ─────────────────────────────────────────────
         # hazard classes: 0=person, 1=bicycle (COCO)
         self.hazard_classes  = set(rospy.get_param('~hazard_classes', [0, 1]))
-        self.danger_dist_m   = float(rospy.get_param('~danger_distance_m', 8.0))
+        self.danger_dist_m   = float(rospy.get_param('~danger_distance_m', 10.0))
         # camera intrinsics for monocular distance estimation
         self.image_w_full    = int(rospy.get_param('~image_w',  1280))
         self.image_h_full    = int(rospy.get_param('~image_h',  720))
