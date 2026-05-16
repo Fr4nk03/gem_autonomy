@@ -1,0 +1,20 @@
+# Scenario A: Worker standing in the vehicle's lane.
+# Vehicle starts at (12.5, -21) yaw=π (facing -x). Pedestrian is placed
+# directly on the centerline, ~12 m ahead.
+#
+# Expected behavior:
+#   YOLO sees person in danger zone → BRAKING → STOPPED_WAIT → VLM_QUERY.
+#   VLM (Qwen2.5-VL) reasons about pose: a stationary person blocking
+#   the road → expected action = STOP. Brain stays parked, re-queries.
+
+objects: []
+
+agents:
+  - name: worker_blocking
+    source:
+      type: fuel
+      uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"
+    trajectory:
+      # Stand still on the centerline, facing the vehicle.
+      - [0.0,  0.0, -21.0, 0.0, 0.0, 0.0, 1.5708]
+      - [60.0, 0.0, -21.0, 0.0, 0.0, 0.0, 1.5708]

@@ -1,0 +1,8 @@
+# Scenario E (sanity): Clear road. No agents at all.
+# Expected behavior:
+#   /yolo/hazard always False → brain stays in DRIVING → vehicle
+#   cruises at SPEED_PROCEED for the duration of the test.
+
+objects: []
+
+agents: []

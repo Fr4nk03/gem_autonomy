@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!--
+    DWA local planner for the GEM vehicle.
+
+    Prerequisites (run first):
+      roslaunch gem_gazebo gem_vehicle.launch
+      roslaunch gem_gazebo spawn_objects.launch yaml_path:=<scene>.yaml  (or spawn_agents)
+
+    Usage:
+      roslaunch gem_dwa_sim dwa_sim.launch \
+        goal_x:=-20.0 goal_y:=-20.0       \
+        agent_vel_x:=0.0 agent_vel_y:=-1.5 \
+        yaml_path:=$(find gem_gazebo)/scenes/highbay_track.yaml
+
+    RViz topics:
+      /dwa/planned_traj      - blue LINE_STRIP  (vehicle planned path)
+      /dwa/goal_marker       - green CYLINDER   (goal region)
+      /dwa/obstacle_markers  - red  SPHERE_LIST (static LiDAR obstacles)
+                             - orange SPHERE    (tracked dynamic agent)
+      /dwa/agent_prediction  - yellow LINE_STRIP (agent constant-vel prediction)
+  -->
+
+  <!-- ── Goal (world frame) ───────────────────────────────── -->
+  <arg name="goal_x"    default="-20.0"/>
+  <arg name="goal_y"    default="-20.0"/>
+
+  <!-- ── Dynamic agent constant velocity (m/s, world frame) ── -->
+  <arg name="agent_vel_x" default="0.0"/>
+  <arg name="agent_vel_y" default="-1.5"/>
+
+  <!-- ── Scene YAML (agent trajectory → bounding box) ────── -->
+  <arg name="yaml_path"        default=""/>
+  <!-- Extra margin (m) added around trajectory bbox for LiDAR filtering -->
+  <arg name="agent_bbox_margin" default="2.0"/>
+
+  <!--
+    robot_state_publisher is required so that TF has the full
+    chain from 'world' down to the Ouster sensor frame.
+    gem_vehicle.launch already sets the robot_description param.
+  -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+        type="robot_state_publisher" output="screen"/>
+
+  <!-- ── DWA planner node ─────────────────────────────────── -->
+  <node name="gem_dwa_sim" pkg="gem_dwa_sim" type="dwa_sim.py" output="screen">
+    <param name="goal_x"      value="$(arg goal_x)"/>
+    <param name="goal_y"      value="$(arg goal_y)"/>
+    <param name="agent_vel_x" value="$(arg agent_vel_x)"/>
+    <param name="agent_vel_y" value="$(arg agent_vel_y)"/>
+    <param name="yaml_path"        value="$(arg yaml_path)"/>
+    <param name="agent_bbox_margin" value="$(arg agent_bbox_margin)"/>
+  </node>
+
+</launch>

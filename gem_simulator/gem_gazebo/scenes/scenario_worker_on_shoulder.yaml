@@ -1,0 +1,20 @@
+# Scenario B: Worker standing on the shoulder, not in the lane.
+# Vehicle starts at (12.5, -21) yaw=π (facing -x). Pedestrian is 12 m
+# ahead but offset ~4 m laterally, outside the camera strike zone.
+#
+# Expected behavior:
+#   YOLO sees a person but it falls OUTSIDE the strike zone (or beyond
+#   the danger distance) → /yolo/hazard remains False → brain stays in
+#   DRIVING. No VLM trigger. Sanity check for false-positive STOPs.
+
+objects: []
+
+agents:
+  - name: worker_shoulder
+    source:
+      type: fuel
+      uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"
+    trajectory:
+      # Stand still on the shoulder.
+      - [0.0,  0.0, -16.5, 0.0, 0.0, 0.0, 1.5708]
+      - [60.0, 0.0, -16.5, 0.0, 0.0, 0.0, 1.5708]

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!--
+    Lightweight YOLOv8 nano object detection node.
+
+    Publishes:
+      /yolo/image_annotated   (sensor_msgs/Image)        - add Image display in RViz
+      /yolo/detection_info    (jsk_rviz_plugins/OverlayText) - add OverlayText display in RViz
+      /yolo/detections        (vision_msgs/Detection2DArray) - structured detections (if vision_msgs installed)
+
+    Usage:
+      roslaunch gem_gazebo yolo_detector.launch
+      roslaunch gem_gazebo yolo_detector.launch image_topic:=/stereo/camera/left/image_raw
+  -->
+
+  <!-- Camera topic to run detection on -->
+  <arg name="image_topic" default="/oak/rgb/image_raw"/>
+
+  <!-- YOLOv8 model variant: yolov8n.pt (nano), yolov8s.pt (small), etc.
+       The model is auto-downloaded on first run. -->
+  <arg name="model"       default="yolov8n.pt"/>
+
+  <!-- Detection confidence threshold [0.0 – 1.0] -->
+  <arg name="confidence"  default="0.4"/>
+
+  <!-- Inference image size (pixels). Smaller = faster. 320 recommended for CPU. -->
+  <arg name="img_size"    default="320"/>
+
+  <!-- Device: 'cpu' or '0' (first GPU) -->
+  <arg name="device"      default="cpu"/>
+
+  <node name="yolo_detector" pkg="gem_gazebo" type="yolo_detector.py" output="screen">
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="model"       value="$(arg model)"/>
+    <param name="confidence"  value="$(arg confidence)"/>
+    <param name="img_size"    value="$(arg img_size)"/>
+    <param name="device"      value="$(arg device)"/>
+  </node>
+
+</launch>

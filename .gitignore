@@ -1,0 +1,24 @@
+# Ignore all __pycache__ directories and .pyc files
+**/__pycache__/
+*.pyc
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+
+# Ignore build and log directories
+build/
+log/
+
+# Ignore system and environment specific files
+*.swp
+*.swo
+.DS_Store
+.env
+.venv
+
+# Ignore generated data files
+**/image_info.txt
+
+# Ignore high bay 3d model
+gem_simulator/gem_gazebo/models/high_bay_3d/

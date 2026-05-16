@@ -1,0 +1,26 @@
+# Scenario D: Cyclist in the lane ahead, moving in the same direction
+# (but slower than the vehicle). Tests the bicycle class branch of the
+# Fast System and the VLM's interpretation of a non-pedestrian agent.
+#
+# Vehicle starts at (12.5, -21) yaw=π (facing -x).
+# Bicycle is a rigid kinematic agent — it stays in the lane and creeps.
+#
+# Expected behavior:
+#   YOLO detects 'bicycle' (and possibly 'person' from the rider model) in
+#   the strike zone within danger distance → /yolo/hazard True → BRAKING.
+#   VLM is expected to choose 'SLOW' (creep behind) or 'STOP' if the
+#   cyclist is barely moving.
+
+objects: []
+
+agents:
+  - name: cyclist_lead
+    motion: rigid
+    source:
+      type: fuel
+      uri: "https://fuel.gazebosim.org/1.0/athackst/models/bicycle"
+    trajectory:
+      # Slow drift along the lane in the +(-x) direction.
+      - [0.0,   2.0,  -21.0, 0.0, 0.0, 0.0, 3.1416]
+      - [40.0, -8.0,  -21.0, 0.0, 0.0, 0.0, 3.1416]
+      - [60.0, -8.0,  -21.0, 0.0, 0.0, 0.0, 3.1416]

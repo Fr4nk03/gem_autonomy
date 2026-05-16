@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+  fast_slow_pipeline.launch
+  ─────────────────────────────────────────────────────────────────
+  Fast-Slow perception pipeline for the POLARIS GEM e4 simulator.
+
+  Brings up:
+    1. Gazebo world + GEM vehicle + scenario agents  (via gem_init)
+    2. yolo_detector       (FAST  — hazard flag from danger zone)
+    3. stop_sign_behavior  (Fast-Slow brain — state machine + control)
+    4. vlm_node            (SLOW  — Qwen2.5-VL-3B reasoning)
+
+  Usage:
+    roslaunch gem_gazebo fast_slow_pipeline.launch \
+        scenario:=worker_in_lane \
+        vlm_backend:=qwen
+
+  Set vlm_backend:=mock on machines without a GPU.
+-->
+<launch>
+
+  <!-- ── world / vehicle / scenario ────────────────────────────────────── -->
+  <arg name="world_name"   default="highbay_track.world"/>
+  <arg name="vehicle_name" default="e4"/>
+  <arg name="x"            default="12.5"/>
+  <arg name="y"            default="-21.0"/>
+  <arg name="yaw"          default="3.1416"/>
+  <arg name="gui"          default="true"/>
+  <arg name="scenario"     default="worker_in_lane"/>
+  <arg name="scene_yaml"
+       default="$(find gem_gazebo)/scenes/scenario_$(arg scenario).yaml"/>
+
+  <!-- ── YOLO (Fast) params ────────────────────────────────────────────── -->
+  <arg name="image_topic"        default="/oak/rgb/image_raw"/>
+  <arg name="yolo_model"         default="yolov8n.pt"/>
+  <arg name="yolo_confidence"    default="0.4"/>
+  <arg name="yolo_img_size"      default="320"/>
+  <arg name="yolo_device"        default="cpu"/>
+  <arg name="danger_distance_m"  default="8.0"/>
+  <arg name="image_w"            default="1280"/>
+  <arg name="image_h"            default="720"/>
+  <arg name="hfov_rad"           default="1.2566"/>  <!-- 72° -->
+  <arg name="strike_zone_left"   default="300.0"/>
+  <arg name="strike_zone_right"  default="980.0"/>
+
+  <!-- ── VLM (Slow) params ─────────────────────────────────────────────── -->
+  <arg name="vlm_backend"        default="qwen"/>    <!-- qwen | mock -->
+  <arg name="vlm_model"          default="Qwen/Qwen2.5-VL-3B-Instruct"/>
+  <arg name="vlm_max_new_tokens" default="256"/>
+  <arg name="vlm_window_size"    default="3"/>
+  <arg name="vlm_window_dt_s"    default="0.7"/>
+
+  <!-- ── 1. world + vehicle + scenario agents ──────────────────────────── -->
+  <include file="$(find gem_launch)/launch/gem_init.launch">
+    <arg name="world_name"   value="$(arg world_name)"/>
+    <arg name="vehicle_name" value="$(arg vehicle_name)"/>
+    <arg name="x"            value="$(arg x)"/>
+    <arg name="y"            value="$(arg y)"/>
+    <arg name="yaw"          value="$(arg yaw)"/>
+    <arg name="gui"          value="$(arg gui)"/>
+    <arg name="custom_scene" value="true"/>
+    <arg name="scene_yaml"   value="$(arg scene_yaml)"/>
+  </include>
+
+  <!-- ── 2. YOLO Fast System ───────────────────────────────────────────── -->
+  <node name="yolo_detector" pkg="gem_gazebo" type="yolo_detector.py" output="screen">
+    <param name="image_topic"        value="$(arg image_topic)"/>
+    <param name="model"              value="$(arg yolo_model)"/>
+    <param name="confidence"         value="$(arg yolo_confidence)"/>
+    <param name="img_size"           value="$(arg yolo_img_size)"/>
+    <param name="device"             value="$(arg yolo_device)"/>
+    <param name="danger_distance_m"  value="$(arg danger_distance_m)"/>
+    <param name="image_w"            value="$(arg image_w)"/>
+    <param name="image_h"            value="$(arg image_h)"/>
+    <param name="hfov_rad"           value="$(arg hfov_rad)"/>
+    <param name="strike_zone_left"   value="$(arg strike_zone_left)"/>
+    <param name="strike_zone_right"  value="$(arg strike_zone_right)"/>
+    <rosparam param="hazard_classes">[0, 1]</rosparam>
+  </node>
+
+  <!-- ── 3. Fast-Slow Brain ────────────────────────────────────────────── -->
+  <node name="fast_slow_brain" pkg="gem_gazebo" type="stop_sign_behavior.py" output="screen">
+    <param name="vehicle_substring" value="gem"/>
+  </node>
+
+  <!-- ── 4. VLM Slow System ────────────────────────────────────────────── -->
+  <node name="vlm_node" pkg="gem_gazebo" type="vlm_node.py" output="screen">
+    <param name="image_topic"     value="$(arg image_topic)"/>
+    <param name="backend"         value="$(arg vlm_backend)"/>
+    <param name="model_id"        value="$(arg vlm_model)"/>
+    <param name="max_new_tokens"  value="$(arg vlm_max_new_tokens)"/>
+    <param name="window_size"     value="$(arg vlm_window_size)"/>
+    <param name="window_dt_s"     value="$(arg vlm_window_dt_s)"/>
+  </node>
+
+</launch>

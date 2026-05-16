@@ -1,0 +1,23 @@
+# Scenario C: Pedestrian walks across the lane and clears it.
+# Vehicle starts at (12.5, -21) yaw=π. Actor crosses perpendicular to
+# the vehicle's heading, entering the strike zone briefly and then
+# clearing to the far shoulder.
+#
+# Expected behavior:
+#   While in lane: /yolo/hazard True → BRAKING → STOPPED_WAIT.
+#   If still crossing when VLM_QUERY fires, VLM should reason this is
+#   a transient crossing → 'SLOW' or 'PROCEED' once gone.
+#   After actor clears the strike zone, hazard goes False → DRIVING.
+
+objects: []
+
+agents:
+  - name: pedestrian_crosser
+    source:
+      type: fuel
+      uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"
+    trajectory:
+      # Start off-lane (shoulder), walk across over ~6 s, then keep going.
+      - [0.0,   0.0, -16.5, 0.0, 0.0, 0.0, -1.5708]
+      - [6.0,   0.0, -25.0, 0.0, 0.0, 0.0, -1.5708]
+      - [60.0,  0.0, -25.0, 0.0, 0.0, 0.0, -1.5708]

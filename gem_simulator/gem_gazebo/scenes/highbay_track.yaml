@@ -1,0 +1,75 @@
+objects:
+  # - name: cone_rear_left
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+  #   xyz: [-17.0, -18.8, 0.0]
+  #   rpy: [0.0, 0.0, 0.0]
+  #   static: false  # Enable physics for this cone
+
+  # - name: cone_rear_right
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+  #   xyz: [-17.0, -14.8, 0.0]
+  #   rpy: [0.0, 0.0, 0.0]
+  #   static: false  # Enable physics for this cone
+
+  # - name: cone_front_left
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+  #   xyz: [-20.5, -18.8, 0.0]
+  #   rpy: [0.0, 0.0, 0.0]
+  #   static: false  # Enable physics for this cone
+
+  # - name: cone_front_right
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction%20Cone"}
+  #   xyz: [-20.5, -14.8, 0.0]
+  #   rpy: [0.0, 0.0, 0.0]
+  #   static: false  # Enable physics for this cone
+
+  # - name: traffic_light
+  #   source: {type: mesh, uri: "model://traffic_light/meshes/traffic_light.dae", scale: [0.03, 0.03, 0.03]}  # Example of using mesh file directly with scale
+  #   xyz: [-34.96, -19.43, 0.0]
+  #   rpy: [0.0, 0.0, 1.57]
+  #   static: true  # Keep traffic light static
+    
+  - name: stop_sign
+    source: {type: sdf, uri: "model://stop_sign"}  # Use the full SDF model
+    xyz: [-10.8, -19.2, 0.0]
+    rpy: [0.0, 0.0, 1.57]
+    static: true  # Keep stop sign static
+
+agents:
+  # - name: pedestrian1
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Walking%20Person"}
+  #   trajectory:
+  #     # Start on sidewalk at time 0.0
+  #     - [0.0 , -12.5, -16.2, 0, 0, 0, -1.57]
+      
+  #     # Walk across the street very slowly (Takes 30 seconds!)
+  #     - [30.0, -12.5, -25.0, 0, 0, 0, -1.57]
+      
+  #     # Turn around quickly
+  #     - [30.5, -12.5, -25.0, 0, 0, 0,  1.57]
+      
+  #     # Walk back very slowly (Takes another 30 seconds!)
+  #     - [60.5, -12.5, -16.2, 0, 0, 0,  1.57]
+      
+  #     # Turn around to face the street again
+  #     - [61.0, -12.5, -100, 0, 0, 0, -1.57]
+
+  # - name: bicycle1
+  #   motion: rigid                       #tells spawner to use rigid mode
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/athackst/models/bicycle"}
+  #   trajectory:
+  #     - [0.0,   -10.0, -15.0,  0,    0,     0,    0.0]    # start, facing "forward"
+  #     - [6.0,   -10.0, -25.0,  0,    0,     0,    0.0]    # drive straight down
+  #     - [7.0,   -10.0, -25.0,  0,    0,     0,    1.57]   # halfway turn (90°)
+  #     - [8.0,   -10.0, -25.0,  0,    0,     0,    3.14]   # complete turn (180°)
+  #     - [14.0,  -10.0, -15.0,  0,    0,     0,    3.14]
+
+  # - name: car1
+  #   motion: rigid                      
+  #   source: {type: fuel, uri: "https://fuel.gazebosim.org/1.0/JShep1/models/hatchback_2"}
+  #   trajectory:
+  #     # time,    x,    y,    z, roll, pitch,   yaw
+  #     - [0.0,   -17.0, -28.0, 0.1,   0,     0,    0.0]    
+  #     - [4.0,     3.0, -28.0, 0.1,   0,     0,    0.0]    
+  #     - [4.5,     3.0, -28.0, 0.1,   0,     0,    3.14]   
+  #     - [8.5,   -17.0, -28.0, 0.1,   0,     0,    3.14]
